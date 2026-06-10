@@ -1,0 +1,20 @@
+package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.config;
+
+
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Aspect
+@Component
+public class AspectHandler {
+    //
+    @AfterThrowing(pointcut = " execution(* project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.*.*(..))", throwing = "exception")
+    public void logExceptionCatch(JoinPoint joinPoint, Throwable exception){
+        String methodName = joinPoint.getSignature().getName();
+        log.error("[LOG] Ngoại lệ xảy ra tại phương thức {} : '{}'",methodName, exception.getMessage() );
+    }
+}
