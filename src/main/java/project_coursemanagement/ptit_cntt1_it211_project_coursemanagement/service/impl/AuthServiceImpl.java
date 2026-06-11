@@ -21,6 +21,7 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.TokenBlacklist;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.RefreshTokenRepository;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.TokenBlacklistRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.UsersRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.jwt.JwtProvider;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-//    private final Token
+    private final TokenBlacklistRepository tokenBlacklistRepository;
 
 
     @Value("${jwt.expiredAccessToken}")
@@ -124,15 +125,17 @@ public class AuthServiceImpl implements AuthService {
         // - hợp lệ --> lấy ra token bằng subString(7) cắt bỏ chuỗi "Bearer "
         String accessToken = header.substring(7);
         String username = jwtProvider.getUsernameFromToken(accessToken);
-        Users users = usersRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Người dùng " + username + " không tồn tại, vui lòng kiểm tra lại"));
-        RefreshToken refreshToken = refreshTokenRepository.findByUser_UsernameAndToken(username, refreshTokenRequest.getRefreshToken());
+        Users users = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Người dùng " + username + " không tồn tại, vui lòng kiểm tra lại"));
+
+        RefreshToken refreshToken = refreshTokenRepository.findByUser_UsernameAndToken(username, refreshTokenRequest.getRefreshToken())
+                .orElseThrow(() -> new TokenInvalidException("RefreshToken không hợp lệ, vui lòng kiểm tra lại"));
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);
 
-        // set lại refreshToken bằng 1 chuỗi bất kỳ -  k hợp lệ  rồi lưu lại cái refreshToken đó vào db
         TokenBlacklist tokenBlacklist = TokenBlacklist.builder().id(null).token(accessToken).revokedAt(LocalDateTime.now()).user(users).build();
         // sau đó đưa cái accessToken revoked đó lưu vào 1 đối tượng blacklist   rồi lưuu db
-        blackLi
+        tokenBlacklistRepository.save(tokenBlacklist);
         // vả trả về blacklistToken đó
     }
 

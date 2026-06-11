@@ -1,5 +1,6 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.LoginRequestDTO;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RefreshTokenRequest;
@@ -10,5 +11,6 @@ public interface AuthService {
     public LoginResponse login(LoginRequestDTO loginRequest);
 
 
-    public String refreshToken (RefreshTokenRequest refreshTokenRequest);
+     String refreshToken (RefreshTokenRequest refreshTokenRequest);
+    void logout(HttpServletRequest request, RefreshTokenRequest refreshTokenRequest);
 }

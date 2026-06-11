@@ -37,4 +37,6 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
             "AND (:email = '' OR u.email LIKE CONCAT('%', :email, '%')) " +
             "AND (:phone = '' OR u.phone LIKE CONCAT('%', :phone, '%'))")
     Optional<Users> findLecturerByEmailAndPhone(@Param("email") String email, @Param("phone") String phone);
+
+    Optional<Users> findByEmail(String email);
 }
