@@ -38,27 +38,37 @@ public class AuthServiceImpl implements AuthService {
     private Long expiredRefreshToken;
 
     @Override
-    public LoginResponse login(LoginRequestDTO loginRequest) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
-        Authentication authentication = authenticationManager.authenticate(authToken);
-        if (authentication.isAuthenticated()){
-            Users targetUser = usersRepository.findByUsername(loginRequest.getUsername()).get();
-            UserPrinciple user = (UserPrinciple) authentication.getPrincipal();
-            String accessToken = jwtProvider.generateAccesToken(user);
-            String refreshToken = jwtProvider.generateRefreshToken(user);
+        public LoginResponse login(LoginRequestDTO loginRequest) {
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+            Authentication authentication = authenticationManager.authenticate(authToken);
+            if (authentication.isAuthenticated()){
+                Users targetUser = usersRepository.findByUsername(loginRequest.getUsername()).get();
+                UserPrinciple user = (UserPrinciple) authentication.getPrincipal();
+                String accessToken = jwtProvider.generateAccesToken(user);
+                String refreshToken = jwtProvider.generateRefreshToken(user);
 
-            refreshTokenRepository.save(RefreshToken.builder()
-                    .id(null)
-                    .token(refreshToken)
-                    .user(targetUser)
-                    .expiredAt(new Date(new Date().getTime() + expiredRefreshToken))
-                    .isRevoked(false)
-                    .build()
-            );
-            UserResponse userResponse = new UserResponse(targetUser.getUsername(), targetUser.getEmail(), targetUser.getPhone());
-            return LoginResponse.builder().user(userResponse).loginTime(LocalDateTime.now()).accessToken(accessToken).refreshToken(refreshToken).build();
-        } else {
-            throw new RuntimeException("Username hoặc password chưa đúng, vui lòng kiểm tra lại!!");
+                refreshTokenRepository.save(RefreshToken.builder()
+                        .id(null)
+                        .token(refreshToken)
+                        .user(targetUser)
+                        .expiredAt(new Date(new Date().getTime() + expiredRefreshToken))
+                        .isRevoked(false)
+                        .build()
+                );
+                UserResponse userResponse = UserResponse.builder()
+                        .userCode(targetUser.getUserCode())
+                        .username(targetUser.getUsername())
+                        .fullName(targetUser.getFullName())
+                        .phone(targetUser.getPhone())
+                        .email(targetUser.getEmail())
+                        .role(targetUser.getRole().getCode().toString())
+                        .isActive(targetUser.isActive())
+                        .createdAt(targetUser.getCreatedAt())
+                        .updatedAt(targetUser.getUpdatedAt())
+                        .build();
+                return LoginResponse.builder().user(userResponse).loginTime(LocalDateTime.now()).accessToken(accessToken).refreshToken(refreshToken).build();
+            } else {
+                throw new RuntimeException("Username hoặc password chưa đúng, vui lòng kiểm tra lại!!");
+            }
         }
-    }
 }

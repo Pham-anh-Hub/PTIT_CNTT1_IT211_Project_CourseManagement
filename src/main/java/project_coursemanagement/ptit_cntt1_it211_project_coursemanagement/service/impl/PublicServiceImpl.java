@@ -1,14 +1,11 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.DataDuplicateException;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RegisterUserDTO;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.RegistedUserResponse;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Role;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RegisterStudentDTO;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.RegisterUserResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.RoleName;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.RoleRepository;
@@ -16,8 +13,6 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.reposi
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.PublicService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 @Service
@@ -28,7 +23,7 @@ public class PublicServiceImpl implements PublicService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public RegistedUserResponse createNewStudentAccounts(RegisterUserDTO registerUserDTO) {
+    public RegisterUserResponse createNewStudentAccounts(RegisterStudentDTO registerUserDTO) {
         if(usersRepository.existsByEmail(registerUserDTO.getEmail())){
             throw new DataDuplicateException("Email đã tồn tại");
         }
@@ -53,7 +48,7 @@ public class PublicServiceImpl implements PublicService {
 
         usersRepository.save(userSaved);
 
-        return new RegistedUserResponse(userSaved.getUsername(), userSaved.getFullName(), userSaved.getPhone(), userSaved.getEmail(), userSaved.getRole().getCode(), LocalDateTime.now());
+        return new RegisterUserResponse(userSaved.getUsername(), userSaved.getFullName(), userSaved.getPhone(), userSaved.getEmail(), userSaved.getRole().getCode(), LocalDateTime.now());
     }
 
 }

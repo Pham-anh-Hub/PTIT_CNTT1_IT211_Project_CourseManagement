@@ -1,7 +1,6 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RegistedUserResponse {
+public class RegisterUserResponse {
     private String username;
     private String fullName;
     private String phone;

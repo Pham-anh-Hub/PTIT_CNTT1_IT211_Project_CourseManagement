@@ -1,10 +1,8 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service;
 
-import org.springframework.http.ResponseEntity;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RegisterUserDTO;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.RegistedUserResponse;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RegisterStudentDTO;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.RegisterUserResponse;
 
 public interface PublicService {
-    RegistedUserResponse createNewStudentAccounts(RegisterUserDTO registerStudentDTO);
+    RegisterUserResponse createNewStudentAccounts(RegisterStudentDTO registerStudentDTO);
 }

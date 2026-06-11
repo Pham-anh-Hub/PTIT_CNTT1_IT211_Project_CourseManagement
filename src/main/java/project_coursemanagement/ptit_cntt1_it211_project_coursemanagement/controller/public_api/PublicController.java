@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RegisterUserDTO;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RegisterStudentDTO;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.PublicService;
 
 @RestController
@@ -20,7 +20,7 @@ public class PublicController {
     private final PublicService publicService;
 
     @PostMapping("/createStudent")
-    public ResponseEntity<?> createNewStudentAccount(@Valid @RequestBody RegisterUserDTO registerUser){
+    public ResponseEntity<?> createNewStudentAccount(@Valid @RequestBody RegisterStudentDTO registerUser){
         // gọi tới service
         return ResponseEntity.status(HttpStatus.CREATED).body(publicService.createNewStudentAccounts(registerUser));
     }

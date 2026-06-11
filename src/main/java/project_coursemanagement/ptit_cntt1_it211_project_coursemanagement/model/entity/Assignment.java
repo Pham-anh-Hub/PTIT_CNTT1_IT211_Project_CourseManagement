@@ -34,5 +34,5 @@ public class Assignment {
 
     @OneToMany(mappedBy = "assignment")
     @Builder.Default
-    private List<Submissions> submissions = new ArrayList<>();
+    private List<Submission> submissions = new ArrayList<>();
 }

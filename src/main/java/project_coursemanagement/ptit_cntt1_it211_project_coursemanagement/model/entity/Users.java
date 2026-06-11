@@ -51,7 +51,7 @@ public class Users {
 
     @OneToMany(mappedBy = "gradedBy")
     @Builder.Default
-    private List<Submissions> gradedSubmissions = new ArrayList<>();
+    private List<Submission> gradedSubmissions = new ArrayList<>();
 
     @OneToMany(mappedBy = "lecturer")
     @Builder.Default

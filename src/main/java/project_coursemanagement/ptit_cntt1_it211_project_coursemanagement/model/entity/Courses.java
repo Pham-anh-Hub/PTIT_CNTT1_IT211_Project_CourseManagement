@@ -20,7 +20,7 @@ public class Courses {
     private Long id;
     @Column(name = "course_code")
     private String courseCode;
-    @Column(name = "course)name")
+    @Column(name = "course_name")
     private String courseName;
     private Integer credit;
 
@@ -28,10 +28,12 @@ public class Courses {
     @JoinColumn(name = "lecturer_id", nullable = false)
     private Users lecturer;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
     @OneToMany(mappedBy = "course")
     @Builder.Default
     private List<Assignment> assignments = new ArrayList<>();
-
     @OneToMany(mappedBy = "course")
     @Builder.Default
     private List<Enrollment> enrollments = new ArrayList<>();

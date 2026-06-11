@@ -12,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class RegisterUserDTO {
+public class RegisterStudentDTO {
     @NotBlank(message = "Username không được để trống")
     private String username;
 

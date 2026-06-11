@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserDetailsServiceCustom;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
 
 import java.io.IOException;
 
@@ -31,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getTokenFromHeader(request);
         if(token != null && jwtProvider.validateToken(token)){
             String username = jwtProvider.getUsernameFromToken(token);
-            UserDetails userDetails = userDetailsServiceCustom.loadUserByUsername(username);
+            UserPrinciple userDetails = (UserPrinciple) userDetailsServiceCustom.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken userAuthenToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(userAuthenToken);
         }

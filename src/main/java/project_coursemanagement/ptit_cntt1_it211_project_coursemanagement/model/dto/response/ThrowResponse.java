@@ -1,8 +1,8 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class ExceptionResponse {
+public class ThrowResponse {
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime catchTime;
     private int code;
     private String error;

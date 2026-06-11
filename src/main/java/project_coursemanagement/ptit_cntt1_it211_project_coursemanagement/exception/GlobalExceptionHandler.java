@@ -4,26 +4,24 @@ package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.excep
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.ExceptionResponse;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.ThrowResponse;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> MethodArgumentNotValidHandle(MethodArgumentNotValidException ex, HttpServletRequest request ){
+    public ResponseEntity<ThrowResponse> MethodArgumentNotValidHandle(MethodArgumentNotValidException ex, HttpServletRequest request ){
         StringBuilder errorMessage =  new StringBuilder();
         ex.getFieldErrors().forEach(fe -> {
             errorMessage.append(fe.getDefaultMessage()).append(", ");
         });
-        ExceptionResponse response = ExceptionResponse.builder()
+        ThrowResponse response = ThrowResponse.builder()
                 .catchTime(LocalDateTime.now())
                 .code(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
@@ -35,8 +33,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataDuplicateException.class)
-    public ResponseEntity<ExceptionResponse> DataDuplicateExceptionHandle(DataDuplicateException ex, HttpServletRequest request ){
-        ExceptionResponse response = ExceptionResponse.builder()
+    public ResponseEntity<ThrowResponse> DataDuplicateExceptionHandle(DataDuplicateException ex, HttpServletRequest request ){
+        ThrowResponse response = ThrowResponse.builder()
                 .catchTime(LocalDateTime.now())
                 .code(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
@@ -45,5 +43,47 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ThrowResponse> NotFoundUserHandle(UserNotFoundException ex, HttpServletRequest request){
+        ThrowResponse response = ThrowResponse.builder()
+                .catchTime(LocalDateTime.now())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ThrowResponse> NoResourceFoundHandle(NoResourceFoundException ex, HttpServletRequest request){
+        ThrowResponse response = ThrowResponse.builder()
+                .catchTime(LocalDateTime.now())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+    }
+
+    @ExceptionHandler(CourseNotFoundException.class)
+    public ResponseEntity<ThrowResponse> NotFoundUserHandle(CourseNotFoundException ex, HttpServletRequest request){
+        ThrowResponse response = ThrowResponse.builder()
+                .catchTime(LocalDateTime.now())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
     }
 }

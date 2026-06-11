@@ -9,4 +9,6 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
     Role findByCode(RoleName code);
+
+    Role findByRoleName(String roleName);
 }
