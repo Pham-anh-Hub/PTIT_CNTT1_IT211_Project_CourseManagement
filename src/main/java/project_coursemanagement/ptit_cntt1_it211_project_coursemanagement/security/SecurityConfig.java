@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/v1/lecturer/**").hasRole("LECTURER")
                                 .requestMatchers("/api/v1/student/**").hasRole("STUDENT")
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, ex) -> {

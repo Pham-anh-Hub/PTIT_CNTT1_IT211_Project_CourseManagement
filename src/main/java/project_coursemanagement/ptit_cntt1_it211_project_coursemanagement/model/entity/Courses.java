@@ -34,6 +34,7 @@ public class Courses {
     @OneToMany(mappedBy = "course")
     @Builder.Default
     private List<Assignment> assignments = new ArrayList<>();
+
     @OneToMany(mappedBy = "course")
     @Builder.Default
     private List<Enrollment> enrollments = new ArrayList<>();

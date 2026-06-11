@@ -20,7 +20,8 @@ public class PublicController {
     private final PublicService publicService;
 
     @PostMapping("/createStudent")
-    public ResponseEntity<?> createNewStudentAccount(@Valid @RequestBody RegisterStudentDTO registerUser){
+    public ResponseEntity<?> createNewStudentAccount
+            (@Valid @RequestBody RegisterStudentDTO registerUser){
         // gọi tới service
         return ResponseEntity.status(HttpStatus.CREATED).body(publicService.createNewStudentAccounts(registerUser));
     }

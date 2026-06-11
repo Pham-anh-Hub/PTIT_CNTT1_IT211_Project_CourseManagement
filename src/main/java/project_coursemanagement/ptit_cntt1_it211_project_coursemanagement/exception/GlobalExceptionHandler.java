@@ -36,13 +36,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ThrowResponse> DataDuplicateExceptionHandle(DataDuplicateException ex, HttpServletRequest request ){
         ThrowResponse response = ThrowResponse.builder()
                 .catchTime(LocalDateTime.now())
-                .code(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .code(HttpStatus.CONFLICT.value())
+                .error(HttpStatus.CONFLICT.getReasonPhrase())
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -86,4 +86,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
     }
+
+
+    @ExceptionHandler(TokenInvalidException.class)
+    public ResponseEntity<ThrowResponse> TokenInvalidHandle(TokenInvalidException ex, HttpServletRequest request){
+        ThrowResponse response = ThrowResponse.builder()
+                .catchTime(LocalDateTime.now())
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+
+    }
+
 }

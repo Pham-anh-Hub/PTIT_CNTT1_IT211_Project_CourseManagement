@@ -8,6 +8,7 @@ import lombok.*;
 @Setter
 @Builder
 public class CourseResponse {
+    private Long id;
     private String courseCode;
     private String courseName;
     private int credits;

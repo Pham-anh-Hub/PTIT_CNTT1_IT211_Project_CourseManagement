@@ -21,14 +21,8 @@ public interface CourseRepository extends JpaRepository<Courses, Long> {
     @Query("""
                 from Courses c
                 where c.isActive = true
-                and
-                    (:courseName = ''
-                        or lower(c.courseName)
-                        like lower(concat('%', :courseName, '%')))
-                and
-                    (:lecturer = ''
-                        or lower(c.lecturer.fullName)
-                        like lower(concat('%', :lecturer, '%')))
+                and (:courseName = '' or lower(c.courseName) like lower(concat('%', :courseName, '%')))
+                and (:lecturer = '' or lower(c.lecturer.fullName) like lower(concat('%', :lecturer, '%')))
             """)
     Page<Courses> searchCourse(@Param("courseName") String courseName, @Param("lecturer") String lecturer, Pageable pageable);
 }

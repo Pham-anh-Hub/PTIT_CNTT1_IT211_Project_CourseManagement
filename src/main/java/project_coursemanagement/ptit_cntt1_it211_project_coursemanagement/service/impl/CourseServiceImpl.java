@@ -134,6 +134,7 @@ public class CourseServiceImpl implements CourseService {
 
     private CourseResponse mapToResponse(Courses course) {
         return CourseResponse.builder()
+                .id(course.getId())
                 .courseCode(course.getCourseCode())
                 .courseName(course.getCourseName())
                 .credits(course.getCredit())

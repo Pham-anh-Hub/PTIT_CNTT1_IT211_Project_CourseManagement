@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.ValidTokenException;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.RefreshTokenRequest;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
 
 import javax.crypto.SecretKey;

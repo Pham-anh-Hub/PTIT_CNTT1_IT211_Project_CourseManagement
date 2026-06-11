@@ -30,6 +30,9 @@ public class PublicServiceImpl implements PublicService {
         if (usersRepository.existsByUsername(registerUserDTO.getUsername())){
             throw new DataDuplicateException("Tên đăng nhập đã tồn tại");
         }
+        if (usersRepository.existsByPhone(registerUserDTO.getPhone())){
+            throw new DataDuplicateException("Số điện thoại đã tồn tại");
+        }
 
         // Tạo tài khoản mới
         Users newStudent = Users.builder()
@@ -44,8 +47,7 @@ public class PublicServiceImpl implements PublicService {
                 .build();
 
         Users userSaved = usersRepository.save(newStudent);
-        userSaved.setUserCode("STU" + String.format("%04d", userSaved.getId()));
-
+        userSaved.setUserCode("STU" + String.format("-%03d-%03d",usersRepository.getUsersByRole_RoleName(userSaved.getRole().getRoleName()), userSaved.getId()));
         usersRepository.save(userSaved);
 
         return new RegisterUserResponse(userSaved.getUsername(), userSaved.getFullName(), userSaved.getPhone(), userSaved.getEmail(), userSaved.getRole().getCode(), LocalDateTime.now());
