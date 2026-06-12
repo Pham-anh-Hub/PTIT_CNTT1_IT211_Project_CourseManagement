@@ -27,6 +27,6 @@ public class UserDetailsServiceCustom implements UserDetailsService {
         Collection<GrantedAuthority> grantedAuthorities = List.of(
                 new SimpleGrantedAuthority("ROLE_" +  user.getRole().getCode())
         );
-        return UserPrinciple.builder().user(user).authorities(grantedAuthorities).build();
+        return new UserPrinciple(user, grantedAuthorities);
     }
 }

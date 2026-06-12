@@ -14,14 +14,13 @@ import java.util.Collection;
 @Getter
 @Setter
 @Builder
-@Component
 public class UserPrinciple implements UserDetails {
     private Users user;
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return this.authorities;
     }
 
     @Override

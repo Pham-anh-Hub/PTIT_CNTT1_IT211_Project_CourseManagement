@@ -35,8 +35,8 @@ public class JwtProvider {
     // sinh Access Token
     public String generateAccesToken(UserPrinciple userPrinciple){
         return Jwts.builder()
-                .setSubject(userPrinciple.getUserCode())
-                .claim("username", userPrinciple.getUsername())
+                .setSubject(userPrinciple.getUsername())
+                .claim("userCode", userPrinciple.getUserCode())
                 .claim("roles", userPrinciple.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiredAccessToken))
@@ -46,8 +46,8 @@ public class JwtProvider {
 
     public String generateRefreshToken(UserPrinciple userPrinciple){
         return Jwts.builder()
-                .setSubject(userPrinciple.getUserCode())
-                .claim("username", userPrinciple.getUsername())
+                .setSubject(userPrinciple.getUsername())
+                .claim("userCode", userPrinciple.getUserCode())
                 .claim("roles", userPrinciple.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiredRefreshToken))
@@ -117,7 +117,12 @@ public class JwtProvider {
     //
     public String getUsernameFromToken(String token){
         SecretKey secret = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody().get("username", String.class);
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
 }

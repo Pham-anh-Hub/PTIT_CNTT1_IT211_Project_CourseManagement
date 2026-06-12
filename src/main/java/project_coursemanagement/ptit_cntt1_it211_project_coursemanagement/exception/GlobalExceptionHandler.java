@@ -102,4 +102,20 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(FileNotValidException.class)
+    public ResponseEntity<ThrowResponse> handleFileNotValid(
+            FileNotValidException ex,
+            HttpServletRequest request) {
+
+        ThrowResponse response = ThrowResponse.builder()
+                .catchTime(LocalDateTime.now())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
 }

@@ -31,6 +31,8 @@ public class Submission {
     @JoinColumn(name = "student_id", nullable = false)
     private Users student;
 
+    @Column(name = "github_url")
+    private String githubUrl;
 
     @Column(length = 1000)
     private String reportUrl;
@@ -46,6 +48,7 @@ public class Submission {
     private Users gradedBy;
 
     private LocalDateTime submittedAt;
+
     private LocalDateTime gradedAt;
 
     @Column(nullable = false, updatable = false)
