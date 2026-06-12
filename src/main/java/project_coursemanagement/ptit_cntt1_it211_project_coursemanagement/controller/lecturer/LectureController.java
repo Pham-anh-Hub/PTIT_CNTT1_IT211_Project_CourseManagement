@@ -17,12 +17,12 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.servic
 @RestController
 @RequestMapping("/api/v1/lecturer")
 @RequiredArgsConstructor
-public class ScoredFeedbackController {
+public class LectureController {
 
 
     private final SetPointFeedbackNoteService setPointFeedbackNoteService;
 
-    @PostMapping("/gradeSubmission")
+    @PostMapping
     public ResponseEntity<ScoreFeedbackResponse> scoreFeedbackSubmission(
             @AuthenticationPrincipal UserPrinciple userPrinciple,
             @Valid @RequestBody ScoreFeedbackRequest request

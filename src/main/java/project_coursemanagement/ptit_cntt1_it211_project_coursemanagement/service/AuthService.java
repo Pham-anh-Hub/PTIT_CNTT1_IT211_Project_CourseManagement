@@ -11,6 +11,6 @@ public interface AuthService {
     public LoginResponse login(LoginRequestDTO loginRequest);
 
 
-     String refreshToken (RefreshTokenRequest refreshTokenRequest);
+    String refreshToken (RefreshTokenRequest refreshTokenRequest);
     void logout(HttpServletRequest request, RefreshTokenRequest refreshTokenRequest);
 }
