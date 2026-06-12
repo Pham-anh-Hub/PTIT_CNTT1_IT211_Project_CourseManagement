@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.MaterialType;
 
 import java.time.LocalDateTime;
 
@@ -38,9 +37,6 @@ public class LearningMaterial {
     private String readingContent;
     // Tên file gốc
     private String fileName;
-    // Loại tài liệu
-    @Enumerated(EnumType.STRING)
-    private MaterialType materialType;
 
     // Kích thước file
     private Long fileSize;

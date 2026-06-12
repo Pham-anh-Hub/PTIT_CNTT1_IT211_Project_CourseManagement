@@ -12,7 +12,7 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.servic
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
 
 @RestController
-@RequestMapping("/api/v1/student/enrollments")
+    @RequestMapping("/api/v1/student/enrollments")
 @RequiredArgsConstructor
 public class EnrollmentController {
 

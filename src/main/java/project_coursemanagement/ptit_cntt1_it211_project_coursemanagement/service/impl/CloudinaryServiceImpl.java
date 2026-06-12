@@ -63,7 +63,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             throw new FileNotValidException("File không hợp lệ, vui lòng kiểm tra lại");
         }
         // Kiểm tra đinh dạng file
-        if (!ALLOWED_TYPES.contains(file.getContentType())){
+        if (!allowedTypes.contains(file.getContentType())){
             throw new FileNotValidException("Định dạng file không hợp lệ, vui lòng kiểm tra lại");
         }
 
@@ -78,7 +78,9 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             // hứng keết quả trả về của phương thức upload trong cloudinary
             Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                     "folder", folder,
-                    "resource_type", resourceType
+                    "resource_type", "auto",       // BẮT BUỘC: Tự động nhận diện định dạng file tài liệu (PDF, DOCX, ZIP...)
+                    "use_filename", true,         // BẮT BUỘC: Giữ lại tên file gốc ban đầu của người dùng
+                    "unique_filename", true  // Thêm hậu tố ngẫu nhiên để tránh việc các file trùng tên ghi đè lên nhau
             )); // chuyển file về dạng nhị phân
             return uploadResult.get("secure_url").toString();
         }catch (Exception e){

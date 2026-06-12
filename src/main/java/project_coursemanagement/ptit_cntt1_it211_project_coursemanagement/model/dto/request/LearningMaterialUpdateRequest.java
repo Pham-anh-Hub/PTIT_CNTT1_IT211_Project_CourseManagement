@@ -3,19 +3,17 @@ package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.MaterialType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LearningMaterialRequest {
-
-    @NotNull(message = "courseId không được để trống")
-    private Long courseId;
-
-    @NotBlank(message = "Tiêu đề không được để trống")
+public class LearningMaterialUpdateRequest {
     @Size(max = 200, message = "Tiêu đề tối đa 200 ký tự")
     private String title;
 
@@ -25,4 +23,8 @@ public class LearningMaterialRequest {
     private String youtubeUrl;
 
     private String readingContent;
+
+    private MultipartFile materialFile;
+
+    private MultipartFile videoFile;
 }

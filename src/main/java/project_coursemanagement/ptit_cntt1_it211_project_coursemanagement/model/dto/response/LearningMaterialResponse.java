@@ -1,10 +1,6 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.MaterialType;
 
 import java.time.LocalDateTime;
@@ -14,22 +10,33 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class LearningMaterialResponse {
+
     private Long id;
     private String materialCode;
     private String title;
     private String description;
     private MaterialType materialType;
-    private String fileUrl;       // FILE
-    private String youtubeUrl;    // YOUTUBE
-    private String videoUrl;      // VIDEO
-    private String readingContent;// READING
+
+    // Tuỳ materialType mà field nào có giá trị, field còn lại null
+    private String fileUrl;        // FILE
+    private String videoUrl;       // VIDEO
+    private String youtubeUrl;     // YOUTUBE
+    private String readingContent; // READING
+
     private String fileName;
     private Long fileSize;
     private Boolean isActive;
+
+    // Thông tin người upload
     private String uploadedByName;
+    private String uploadedByUsername;
+
+    // Thông tin khóa học
     private Long courseId;
     private String courseTitle;
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
