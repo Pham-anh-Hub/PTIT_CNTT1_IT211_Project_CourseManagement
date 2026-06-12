@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -21,20 +22,43 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
     @Value("${spring.servlet.multipart.max-file-size}")
     private Long maxFileSize;
+    private static final long MAX_VIDEO_SIZE = 100L * 1024 * 1024; // 100MB
 
     // chỉ cho phép những đinh dạng tài liệu cho phép
-    private static final List<String> ALLOWED_TYPES = List.of(
+    private static final Set<String> ALLOWED_TYPES = Set.of(
             "application/pdf",
+            // Word
             "application/msword",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/x-zip-compressed",
+            // PowerPoint
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            // ZIP
             "application/zip",
-            "application/x-rar-compressed"
+            "application/x-zip-compressed"
     );
 
     @Override
     public String uploadFile(MultipartFile file) {
         // kiểm tra file trống
+        validateFile(file, ALLOWED_TYPES);
+        return doUpload(file, "student_submission", "raw");
+    }
+
+    @Override
+    public String uploadMaterialFile(MultipartFile file) {
+        validateFile(file, ALLOWED_TYPES);
+        return doUpload(file, "learning_materials/files", "raw");
+    }
+
+    @Override
+    public String uploadMaterialVideo(MultipartFile file) {
+        validateFile(file, ALLOWED_TYPES);
+        return doUpload(file, "learning_materials/videos", "video");
+    }
+
+
+    public void validateFile(MultipartFile file, Set<String> allowedTypes){
         if(file == null || file.isEmpty()){
             throw new FileNotValidException("File không hợp lệ, vui lòng kiểm tra lại");
         }
@@ -44,18 +68,21 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         }
 
         if (file.getSize() > maxFileSize){
-            throw new FileNotValidException("Dung lượng file vượt quá giới hạn, tối đa 5MB");
+            throw new FileNotValidException("Dung lượng file vượt quá giới hạn, tối đa 15MB");
         }
+    }
 
+
+    public String doUpload(MultipartFile file, String folder, String resourceType){
         try{
             // hứng keết quả trả về của phương thức upload trong cloudinary
             Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                    "folder", "student_submissions",
-                    "resource_type", "raw"
+                    "folder", folder,
+                    "resource_type", resourceType
             )); // chuyển file về dạng nhị phân
             return uploadResult.get("secure_url").toString();
         }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Lỗi kết nối Cloud, vui lòng thử lại");
         }
 
     }

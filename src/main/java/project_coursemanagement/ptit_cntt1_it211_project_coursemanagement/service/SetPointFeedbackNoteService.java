@@ -1,0 +1,9 @@
+package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service;
+
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.ScoreFeedbackRequest;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.ScoreFeedbackResponse;
+
+public interface SetPointFeedbackNoteService {
+    ScoreFeedbackResponse gradeSubmission(String lecturerUsername, ScoreFeedbackRequest request);
+
+}

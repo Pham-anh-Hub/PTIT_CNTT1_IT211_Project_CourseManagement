@@ -38,7 +38,7 @@ public class Submission {
     private String reportUrl;
 
 
-    private Double score;
+    private Integer score;
 
     @Column(length = 2000)
     private String feedback;
