@@ -3,12 +3,12 @@ package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.servi
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.TokenInvalidException;
@@ -18,10 +18,8 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.LoginResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.UserResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.RefreshToken;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.TokenBlacklist;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.RefreshTokenRepository;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.TokenBlacklistRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.UsersRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.jwt.JwtProvider;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
@@ -29,9 +27,9 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.servic
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final StringRedisTemplate redisTemplate;
 
 
     @Value("${jwt.expiredAccessToken}")
@@ -133,10 +131,20 @@ public class AuthServiceImpl implements AuthService {
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);
 
-        TokenBlacklist tokenBlacklist = TokenBlacklist.builder().id(null).token(accessToken).revokedAt(LocalDateTime.now()).user(users).build();
-        // sau đó đưa cái accessToken revoked đó lưu vào 1 đối tượng blacklist   rồi lưuu db
-        tokenBlacklistRepository.save(tokenBlacklist);
-        // vả trả về blacklistToken đó
+        // chỉnh sửa lại để xử lý với redis
+        // đưa  access token vào redis blacklist
+        try{
+            // lấy thời gian hết hạn của token, tính thời gian sống còn lại
+            long expiredTime = jwtProvider.getExpirationFromToken(accessToken).getTime();
+            long restTime = expiredTime - System.currentTimeMillis();
+
+            if (restTime > 0) {
+                redisTemplate.opsForValue().set(accessToken, "revoked", restTime, TimeUnit.MILLISECONDS);
+            }
+        } catch (Exception e) {
+            // In lỗi chi tiết ra tab Console của IntelliJ để dễ debug nếu có sự cố khác
+            throw new TokenInvalidException("Không thể xử lý token với blacklist: " + e.getMessage());
+        }
     }
 
 

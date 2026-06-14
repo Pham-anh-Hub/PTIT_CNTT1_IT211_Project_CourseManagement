@@ -6,4 +6,5 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 
 public interface SubmissionService {
     SubmissionResponse submitAssignment(String username, SubmissionRequest request, MultipartFile file);
+    SubmissionResponse updateSubmission(String username, Long submissionId, SubmissionRequest request, MultipartFile reportFile);
 }

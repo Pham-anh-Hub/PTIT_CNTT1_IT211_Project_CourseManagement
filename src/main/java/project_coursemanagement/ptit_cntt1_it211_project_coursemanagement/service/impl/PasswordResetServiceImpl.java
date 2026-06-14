@@ -1,22 +1,23 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.TokenInvalidException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.UserNotFoundException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.ResetPasswordRequest;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.ResetPasswordResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.VerifyOtpResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.PasswordResetToken;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.TokenBlacklist;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.ResetPasswordTokenRepository;
-import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.TokenBlacklistRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.UsersRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.jwt.JwtProvider;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.PasswordResetService;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -28,7 +29,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final OtpService otpService;
     private final EmailService emailService;
     private final JwtProvider jwtProvider;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final StringRedisTemplate redisTemplate;
 
 
     @Override
@@ -119,13 +120,21 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         // Điều này ngăn chặn hacker thu thập lại token cũ để đổi mật khẩu lần 2
         // (Sử dụng chính thực thể TokenBlacklist bạn đã hoàn thiện ở tính năng Logout)
 
-        TokenBlacklist blacklist = TokenBlacklist.builder()
-                .id(null)
-                .token(resetPasswordRequest.getResetToken())
-                .revokedAt(LocalDateTime.now())
-                .user(user)
-                .build();
-        tokenBlacklistRepository.save(blacklist);
+        // chỉnh sửa lại để xử lý với redis
+        // đưa  access token vào redis blacklist
+        try{
+            String resetToken = resetPasswordRequest.getResetToken();
+            // lấy thời gian hết hạn của token, tính thời gian sống còn lại
+            long expiredTime = jwtProvider.getExpirationFromToken(resetToken).getTime();
+            Long restTime = System.currentTimeMillis() - expiredTime;
+
+            if (restTime > 0){
+                // accessToken chưa hết hạn --> đưa vào redis
+                redisTemplate.opsForValue().set(resetToken, "reset_used", restTime, TimeUnit.MILLISECONDS);
+            }
+        } catch (Exception e) {
+            throw new TokenInvalidException("Không thể xử lý token với blacklist");
+        }
 
         return ResetPasswordResponse.builder().email(user.getEmail()).username(user.getUsername()).message("Cập nhật mật khẩu mới thành công").resetTime(LocalDateTime.now()).build();
     }

@@ -16,7 +16,6 @@ public interface CourseRepository extends JpaRepository<Courses, Long> {
 
     Optional<Courses> findByCourseCode(String code);
 
-    Optional<Courses> findByIdAndActiveTrue(Long id);
 
     @Query("""
                 from Courses c

@@ -1,4 +1,4 @@
-package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.controller;
+package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.controller.public_api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

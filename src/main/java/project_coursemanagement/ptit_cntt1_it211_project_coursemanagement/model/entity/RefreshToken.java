@@ -23,5 +23,6 @@ public class RefreshToken {
     // Thời gian hết hạn, để chi cần gọi lấy ra chứ không phải mất công giải mã thời gian được mã hóa trong token nữa
     @Column(name = "expired_at")
     private Date expiredAt;
+    @Builder.Default
     private boolean isRevoked = false;
 }

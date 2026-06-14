@@ -1,7 +1,9 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.impl;
 
+import jakarta.persistence.PreUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.*;
@@ -12,12 +14,17 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.LearningMaterial;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.CourseRepository;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.EnrollmentRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.LearningMaterialRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.UsersRepository;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.CloudinaryService;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.LearningMaterialService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,6 +34,7 @@ public class LearningMaterialServiceImpl implements LearningMaterialService {
     private final CourseRepository courseRepository;
     private final CloudinaryService cloudinaryService;
     private final LearningMaterialRepository learningMaterialRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @Value("${spring.servlet.multipart.max-file-size}")
     private Long maxFileSize;
@@ -75,6 +83,7 @@ public class LearningMaterialServiceImpl implements LearningMaterialService {
         material.setFileUrl(fileUrl);
         material.setFileName(fileName);
         material.setVideoUrl(videoUrl);
+        material.setFileSize(materialFile != null && videoFile != null ? materialFile.getSize() + videoFile.getSize() : 0);
         material.setYoutubeUrl(materialRequest.getYoutubeUrl());
         material.setReadingContent(materialRequest.getReadingContent());
 
@@ -146,10 +155,82 @@ public class LearningMaterialServiceImpl implements LearningMaterialService {
             material.setVideoUrl(newVideoUrl);
         } // Nếu không truyền videoFile mới, video cũ được giữ lại hoàn toàn
 
+        material.setFileSize(newMaterialFile != null && newVideoFile != null ? newMaterialFile.getSize() + newVideoFile.getSize() : 0);
+
+
         // 8. Cập nhật thời gian chỉnh sửa mới nhất
         material.setUpdatedAt(LocalDateTime.now());
         return mapToResponse(learningMaterialRepository.save(material));
     }
+
+    // Lấy danh sách tất cả tài liệu học tập (is active)
+    @PreAuthorize("hasAnyRole('LECTURER', 'ADMIN')")
+    public List<LearningMaterialResponse> getAllActiveMaterial(){
+        List<LearningMaterial> resultGet = learningMaterialRepository.getAllByIsActiveTrue();
+        List<LearningMaterialResponse> responseList = new ArrayList<>();
+        resultGet.forEach(material -> responseList.add(mapToResponse(material)));
+        return responseList;
+    }
+
+
+    // Lấy danh sách tài liệu học tập cụ thể theo khóa học cụ thể
+    @Override
+    public LearningMaterialResponse getMaterialByCourseIdAndCourseLecture(UserPrinciple userPrinciple, Long materialId, Long courseId) {
+        // 1. Kiểm tra khóa học có tồn tại không
+        Courses course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException("Không tìm thấy khóa học, vui lòng kiểm tra lại"));
+
+        // 2. Kiểm tra tài liệu học tập có tồn tại trong khóa học này không
+        LearningMaterial material = learningMaterialRepository.findByIdAndCourse_IdAndIsActiveIsTrue(materialId, courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tài liệu học tập không tồn tại hoặc không thuộc khóa học này."));
+
+        // 3. XỬ LÝ PHÂN QUYỀN ĐỘNG THEO VAI TRÒ (ROLE) CỦA USER HIỆN TẠI
+        String currentRole = userPrinciple.getUser().getRole().getRoleName(); // Giả định bạn có hàm lấy tên Role (ROLE_STUDENT, ROLE_LECTURER, ROLE_ADMIN)
+        Long currentUserId = userPrinciple.getUserId();
+
+        // Rẽ nhánh: Nếu là Sinh viên (STUDENT), bắt buộc phải kiểm tra xem đã tham gia (Enrollment) khóa học chưa
+        if ("ROLE_STUDENT".equals(currentRole)) {
+            boolean isEnrolled = enrollmentRepository.existsByStudents_IdAndCourse_IdAndActiveIsTrue(currentUserId, courseId);
+            if (!isEnrolled) {
+                throw new CustomAccessDeniedException("Thao tác bị từ chối! Bạn không tham gia khóa học này nên không thể xem tài liệu.");
+            }
+        }
+
+        // 4. Ánh xạ dữ liệu sang DTO và phản hồi về cho Client
+        return mapToResponse(material);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()") // Ép buộc tất cả các đối tượng gọi vào đều phải qua bộ lọc Login
+    public List<LearningMaterialResponse> getMaterialsByCourseWithRoleCheck(UserPrinciple userPrinciple, Long courseId) {
+
+        // 1. Kiểm tra sự tồn tại của Khóa học
+        Courses course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException("Không tìm thấy khóa học, vui lòng kiểm tra lại"));
+
+        // 2. XỬ LÝ PHÂN QUYỀN ĐỘNG THEO VAI TRÒ (ROLE) TRONG HỆ THỐNG
+        String currentRole = userPrinciple.getUser().getRole().getRoleName(); // Lấy tên quyền (ROLE_STUDENT, ROLE_LECTURER, ROLE_ADMIN)
+        Long currentUserId = userPrinciple.getUserId();
+
+        // Rẽ nhánh: Nếu người dùng đăng nhập hiện tại là Sinh viên (STUDENT)
+        if ("ROLE_STUDENT".equals(currentRole)) {
+            // Kiểm tra xem sinh viên có đăng ký (Enrollment) khóa học này hay không
+            boolean isEnrolled = enrollmentRepository.existsByStudents_IdAndCourse_IdAndActiveIsTrue(currentUserId, courseId);
+            if (!isEnrolled) {
+                throw new CustomAccessDeniedException("Thao tác bị từ chối! Bạn không tham gia khóa học này nên không thể xem tài liệu.");
+            }
+        }
+
+        // Rẽ nhánh: Nếu là LECTURER hoặc ADMIN thì không bị chặn (Được xem danh sách công khai)
+
+        // 3. Lấy danh sách tài liệu từ Repository
+        List<LearningMaterial> materials = learningMaterialRepository.findByCourse_IdAndIsActiveTrueOrderByCreatedAtDesc(courseId);
+
+        // 4. Áp dụng Java Stream API chuyển đổi mảng Thực thể sang cấu trúc DTO trả về cho Client
+        return materials.stream().map(this::mapToResponse).collect(Collectors.toList()); // Dùng hàm mapToResponse đã ánh xạ đầy đủ trường (bao gồm cả fileName)
+
+    }
+
 
     private String generateMaterialCode() {
         String code;

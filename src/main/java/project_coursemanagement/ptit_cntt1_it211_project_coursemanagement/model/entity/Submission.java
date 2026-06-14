@@ -25,6 +25,7 @@ public class Submission {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
+    @Builder.Default
     private SubmissionStatus status = SubmissionStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

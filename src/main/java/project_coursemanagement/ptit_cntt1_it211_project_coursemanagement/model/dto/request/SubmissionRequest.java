@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class SubmissionRequest {
     @NotNull(message = "Vui lòng không để trống mã bài tập cần nộp")
     private Long assignmentId;

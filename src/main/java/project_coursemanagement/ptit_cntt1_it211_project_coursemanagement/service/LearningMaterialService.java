@@ -5,6 +5,7 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.LearningMaterialUpdateRequest;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.LearningMaterialResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.LearningMaterial;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle.UserPrinciple;
 
 import java.util.List;
 
@@ -15,8 +16,10 @@ public interface LearningMaterialService {
     // Cập nhật tài liệu
     LearningMaterialResponse updateMaterial(String lecturerUsername, Long materialId, LearningMaterialUpdateRequest request);
 
-    // xem danh sách tài liệu của giảng viên
-//    List<LearningMaterial> getLecturerMaterials();
+    // xem taì liệu cụ thể của khóa học cụ thể
+    LearningMaterialResponse getMaterialByCourseIdAndCourseLecture(UserPrinciple userPrinciple, Long materialId, Long courseId);
 
-    // Sinh viên xem
+    List<LearningMaterialResponse> getMaterialsByCourseWithRoleCheck(UserPrinciple userPrinciple, Long courseId);
+    // Sinh viên xem danh sách tài liệu của một khóa học cụ thể
+
 }

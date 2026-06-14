@@ -57,9 +57,6 @@ public class Users {
     @Builder.Default
     private List<Courses> teachingCourses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    @Builder.Default
-    private List<TokenBlacklist> tokenBlacklists = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

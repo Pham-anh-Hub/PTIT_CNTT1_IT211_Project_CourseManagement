@@ -1,10 +1,9 @@
 package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.security.principle;
 
 import lombok.*;
-import org.jspecify.annotations.Nullable;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 
 import java.util.Collection;
@@ -38,5 +37,8 @@ public class UserPrinciple implements UserDetails {
     }
     public Long getUserId(){
         return user.getId();
+    }
+
+    public void setUsername(String student01) {
     }
 }
