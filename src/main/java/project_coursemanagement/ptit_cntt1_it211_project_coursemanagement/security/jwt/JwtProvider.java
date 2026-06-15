@@ -38,6 +38,7 @@ public class JwtProvider {
                 .setSubject(userPrinciple.getUsername())
                 .claim("userCode", userPrinciple.getUserCode())
                 .claim("roles", userPrinciple.getAuthorities())
+                .claim("type", "ACCESS")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiredAccessToken))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -47,8 +48,7 @@ public class JwtProvider {
     public String generateRefreshToken(UserPrinciple userPrinciple){
         return Jwts.builder()
                 .setSubject(userPrinciple.getUsername())
-                .claim("userCode", userPrinciple.getUserCode())
-                .claim("roles", userPrinciple.getAuthorities())
+                .claim("type", "REFRESH")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiredRefreshToken))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -92,6 +92,14 @@ public class JwtProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getClaimFromToken(String token, String claim){
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody().get(claim, String.class);
     }
 
     // Lấy userCode từ bất kỳ loại token nào

@@ -2,11 +2,13 @@ package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.servi
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.BadRequestException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.UserNotFoundException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.ScoreFeedbackRequest;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.response.ScoreFeedbackResponse;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Submission;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.RoleName;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.SubmissionStatus;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.SubmissionRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.UsersRepository;
@@ -27,8 +29,16 @@ public class SetPointFeedbackNoteServiceImpl implements SetPointFeedbackNoteServ
         // Lấy thông tin giảng viên đang đăng nhập
         Users lecturer = usersRepository.findByUsername(lecturerUsername).orElseThrow(() -> new UserNotFoundException("Không tìm thấy giảng viên, vui lòng kiểm tra lại"));
 
+        if(!lecturer.getRole().getCode().equals(RoleName.LECTURER)) {
+            throw new BadRequestException("Chỉ giảng viên mới có thể chấm bài, vui lòng kiểm tra lại!");
+        }
+
         // Tìm bài nộp theo submissionID
         Submission submission = submissionRepository.findById(request.getSubmissionId()).orElseThrow(() -> new RuntimeException("Không tìm thấy bài nộp nào"));
+
+        if(submission.getAssignment().getCourse().getLecturer().getId().equals(lecturer.getId())){
+            throw new BadRequestException("Chỉ giảng viên của khóa học này mới có thể chấm bài!!");
+        }
 
         // Kiểm tra trạng thái bài nộp có thể sẽ được chấm hay không
         if (submission.getStatus() == SubmissionStatus.PENDING) {

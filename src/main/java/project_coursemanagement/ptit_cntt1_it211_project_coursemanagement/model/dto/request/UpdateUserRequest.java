@@ -20,7 +20,9 @@ public class UpdateUserRequest {
     @Email(message = "Email không đúng định dạng")
     private String email;
 
+    @NotBlank(message = "Vai trò không được để trống")
     private String roleName;
 
+    @NotBlank(message = "Không để trống trạng thái")
     private Boolean isActive;
 }

@@ -12,6 +12,7 @@ public class CourseResponse {
     private String courseCode;
     private String courseName;
     private int credits;
+    private int enrollCount;
     private String lecturerFullName;
     private String lecturerEmail;
     private String lecturerPhone;

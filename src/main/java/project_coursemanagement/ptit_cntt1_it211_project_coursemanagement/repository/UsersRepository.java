@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface UsersRepository extends JpaRepository<Users, Long> {
 
-    @Query("from Users u where u.username like concat('%',:username, '%') and u.phone like concat('%', :phone, '%')")
+    @Query("from Users u where u.isActive = true and u.username like concat('%',:username, '%') and u.phone like concat('%', :phone, '%')")
     Page<Users> getUsersByUsernameAndPhone(@Param("username") String username, @Param("phone") String phone, Pageable pageable);
 
     @Query("""

@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.BadRequestException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.TokenInvalidException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.UserNotFoundException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.LoginRequestDTO;
@@ -78,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
                     .build();
             return LoginResponse.builder().user(userResponse).loginTime(LocalDateTime.now()).accessToken(accessToken).refreshToken(refreshToken).build();
         } else {
-            throw new RuntimeException("Username hoặc password chưa đúng, vui lòng kiểm tra lại!!");
+            throw new BadRequestException("Username hoặc password chưa đúng, vui lòng kiểm tra lại!!");
         }
     }
 
@@ -96,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
             Users user = usersRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Người dùng " + username + " không tồn tại, vui lòng kiểm tra lại"));
 //            kiểm tra refreshToken có hợp lệ trong DB hay chưa
             RefreshToken token = refreshTokenRepository.getRefreshTokenByTokenAndUser(refreshTokenRequest.getRefreshToken(), user).orElse(null);
-
+            System.out.println("token: " + token);
             if (token != null && !token.isRevoked()) {
 //            Khởi tạo userPrinciple với user trên và quyền của nó
 //            rồi khởi tạo accessToken mới và trả về

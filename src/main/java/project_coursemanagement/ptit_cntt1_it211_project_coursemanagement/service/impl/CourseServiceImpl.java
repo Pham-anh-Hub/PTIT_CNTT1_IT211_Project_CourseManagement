@@ -17,6 +17,7 @@ import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.entity.Users;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.enums.RoleName;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.CourseRepository;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.EnrollmentRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.repository.UsersRepository;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.service.CourseService;
 
@@ -28,6 +29,7 @@ import java.util.List;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final UsersRepository usersRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @Override
     public List<CourseResponse> getAllCourseByNameOrLecturer(String courseName, String lecturer, Pageable pageable) {
@@ -141,6 +143,7 @@ public class CourseServiceImpl implements CourseService {
                 .lecturerFullName(course.getLecturer().getFullName())
                 .lecturerEmail(course.getLecturer().getEmail())
                 .lecturerPhone(course.getLecturer().getPhone())
+                .enrollCount(enrollmentRepository.getAllByCourse_Id(course.getId()).size())
                 .build();
     }
 }
