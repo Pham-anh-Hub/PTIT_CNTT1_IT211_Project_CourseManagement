@@ -10,8 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.BadRequestException;
+import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.CustomAccessDeniedException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.TokenInvalidException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.exception.UserNotFoundException;
 import project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model.dto.request.LoginRequestDTO;
@@ -50,10 +52,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequestDTO loginRequest) {
+        Users targetUser = usersRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new UserNotFoundException("Tài khoản không tồn tại, vui lòng kiểm tra lại!"));
+        if (!BCrypt.checkpw(loginRequest.getPassword(), targetUser.getPasswordHash())){
+            throw new UserNotFoundException("Username hoặc mật khẩu chưa đúng, vui lòng kiểm tra lại!");
+        }
+        if(!targetUser.isActive()){
+            throw new CustomAccessDeniedException("Người dùng không tồn tại hoặc đã bị khóa, vui lòng kiểm tra lại");
+        }
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(authToken);
         if (authentication.isAuthenticated()) {
-            Users targetUser = usersRepository.findByUsername(loginRequest.getUsername()).get();
+//            Users targetUser = usersRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new UserNotFoundException("Tài khoản không tồn tại, vui lòng kiểm tra lại!"));
             UserPrinciple user = (UserPrinciple) authentication.getPrincipal();
             String accessToken = jwtProvider.generateAccesToken(user);
             String refreshToken = jwtProvider.generateRefreshToken(user);
@@ -99,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
             RefreshToken token = refreshTokenRepository.getRefreshTokenByTokenAndUser(refreshTokenRequest.getRefreshToken(), user).orElse(null);
             System.out.println("token: " + token);
             if (token != null && !token.isRevoked()) {
-//            Khởi tạo userPrinciple với user trên và quyền của nó
+//            Khởi tạo userPrinciple với user bên trên và quyền của nó
 //            rồi khởi tạo accessToken mới và trả về
                 Collection<GrantedAuthority> authorities = List.of(
                         new SimpleGrantedAuthority("ROLE_" + user.getRole().getCode())
@@ -124,9 +133,6 @@ public class AuthServiceImpl implements AuthService {
         // - hợp lệ --> lấy ra token bằng subString(7) cắt bỏ chuỗi "Bearer "
         String accessToken = header.substring(7);
         String username = jwtProvider.getUsernameFromToken(accessToken);
-        Users users = usersRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("Người dùng " + username + " không tồn tại, vui lòng kiểm tra lại"));
-
         RefreshToken refreshToken = refreshTokenRepository.findByUser_UsernameAndToken(username, refreshTokenRequest.getRefreshToken())
                 .orElseThrow(() -> new TokenInvalidException("RefreshToken không hợp lệ, vui lòng kiểm tra lại"));
         refreshToken.setRevoked(true);
@@ -143,10 +149,10 @@ public class AuthServiceImpl implements AuthService {
                 redisTemplate.opsForValue().set(accessToken, "revoked", restTime, TimeUnit.MILLISECONDS);
             }
         } catch (Exception e) {
-            // In lỗi chi tiết ra tab Console của IntelliJ để dễ debug nếu có sự cố khác
             throw new TokenInvalidException("Không thể xử lý token với blacklist: " + e.getMessage());
         }
     }
+
 
 
 }

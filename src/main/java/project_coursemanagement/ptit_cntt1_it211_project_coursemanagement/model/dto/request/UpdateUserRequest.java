@@ -2,6 +2,7 @@ package project_coursemanagement.ptit_cntt1_it211_project_coursemanagement.model
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,6 @@ public class UpdateUserRequest {
     @NotBlank(message = "Vai trò không được để trống")
     private String roleName;
 
-    @NotBlank(message = "Không để trống trạng thái")
+    @NotNull(message = "Không để trống trạng thái")
     private Boolean isActive;
 }

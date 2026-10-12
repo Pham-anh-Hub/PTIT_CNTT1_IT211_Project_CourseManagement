@@ -151,7 +151,6 @@ class UserControllerTest {
         when(adminService.updateUser(eq(1L), any()))
                 .thenReturn(response);
 
-        // TODO: thay JSON này theo đúng field của UpdateUserRequest thực tế của bạn
         String requestJson = """
                 {
                   "fullName": "Nguyễn Văn A",
@@ -177,7 +176,6 @@ class UserControllerTest {
         when(adminService.patchUser(eq(1L), any()))
                 .thenReturn(response);
 
-        // TODO: thay JSON này theo đúng field của UpdateUserPatchRequest thực tế của bạn
         String requestJson = """
                 {
                   "fullName": "Nguyễn Văn C",
@@ -206,6 +204,6 @@ class UserControllerTest {
 
         mockMvc.perform(delete("/api/v1/admin/users/1"))
                 .andExpect(status().isNoContent());
-        // 204 thì nên không assert body
+        // 204 thì không assert body
     }
 }

@@ -30,10 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
-        // BƯỚC 1: Nếu là API login hoặc refresh, cho đi qua Filter luôn và THOÁT HÀM NGAY LẬP TỨC
+
         if (requestURI.contains("/api/v1/auth/login") || requestURI.contains("/api/v1/auth/refresh")) {
             filterChain.doFilter(request, response);
-            return; // Quan trọng: return ở đây để ngắt hàm không chạy tiếp xuống dưới!
+            return; // return ở đây để ngắt hàm không chạy tiếp xuống dưới!
         }
 
         String token = getTokenFromHeader(request);
@@ -48,8 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if(!tokenType.equals("ACCESS")){
                     throw new TokenInvalidException("Yêu cầu các thực chưa hợp lệ, vui lòng kiểm tra lại token");
                 }
-
-
                 String username = jwtProvider.getUsernameFromToken(token);
                 UserPrinciple userDetails = (UserPrinciple) userDetailsServiceCustom.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken userAuthenToken =

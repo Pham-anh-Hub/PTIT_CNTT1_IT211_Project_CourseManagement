@@ -26,7 +26,7 @@ public class CourseController {
     public ResponseEntity<?> getAllCourses(
             @RequestParam(defaultValue = "") String courseName,
             @RequestParam(defaultValue = "") String lecturer,
-            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
+            @PageableDefault(page = 0, size = 5, sort = "courseName", direction = Sort.Direction.ASC)
             Pageable pageable) {
         List<CourseResponse> responses = courseService.getAllCourseByNameOrLecturer(courseName, lecturer, pageable);
         return ResponseEntity.ok(responses);

@@ -1,0 +1,22 @@
+name: CI FOR JavaWebService App
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  test-matrix:
+    name: Test on Java ${{ matrix.java-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: ['17', '21']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'gradle'
+      - run: chmod +x gradlew
+      - run: ./gradlew test

@@ -41,7 +41,6 @@ class LearningMaterialServiceImplTest {
     @Mock private CourseRepository courseRepository;
     @Mock private CloudinaryService cloudinaryService;
     @Mock private LearningMaterialRepository learningMaterialRepository;
-    @Mock private EnrollmentRepository enrollmentRepository;
 
     @InjectMocks
     private LearningMaterialServiceImpl learningMaterialService;
@@ -53,8 +52,7 @@ class LearningMaterialServiceImplTest {
             "maxFileSize", 15728640L); // 15MB
     }
 
-    // ── Dữ liệu dùng chung ───────────────────────────────────
-
+    // Dữ liệu dùng chung
     private Users mockLecturer() {
         Users lecturer = new Users();
         lecturer.setId(1L);
@@ -87,7 +85,7 @@ class LearningMaterialServiceImplTest {
         return m;
     }
 
-    // ── TC-SV-01: Tạo tài liệu với file thành công ───────────
+    // TC-SV-01: Tạo tài liệu với file thành công
     @Test
     @DisplayName("TC-SV-01: Tạo tài liệu kèm file thành công")
     void createUploadMaterial_withFile_success() {
@@ -133,7 +131,7 @@ class LearningMaterialServiceImplTest {
         verify(learningMaterialRepository, times(1)).save(any());
     }
 
-    // ── TC-SV-02: Giảng viên không tồn tại → UserNotFoundException ──
+    // TC-SV-02: Giảng viên không tồn tại → UserNotFoundException
     @Test
     @DisplayName("TC-SV-02: Giảng viên không tồn tại ném UserNotFoundException")
     void createUploadMaterial_lecturerNotFound_throwsException() {
@@ -154,7 +152,7 @@ class LearningMaterialServiceImplTest {
         verify(courseRepository, never()).findById(any());
     }
 
-    // ── TC-SV-03: File vượt quá 15MB → FileNotValidException ─
+    // TC-SV-03: File vượt quá 15MB --> FileNotValidException
     @Test
     @DisplayName("TC-SV-03: File vượt 15MB ném FileNotValidException")
     void createUploadMaterial_fileTooLarge_throwsException() {
